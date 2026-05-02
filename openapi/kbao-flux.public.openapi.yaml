@@ -1,0 +1,251 @@
+openapi: 3.1.0
+info:
+  title: KBAO Flux Public API
+  version: 0.1.0
+  description: Public evaluation API contract for the KBAO Flux mock server.
+servers:
+  - url: http://127.0.0.1:8088
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        "200":
+          description: Server is healthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/v1/agents:
+    get:
+      summary: List public agents
+      operationId: listAgents
+      responses:
+        "200":
+          description: Public agents.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentListResponse"
+  /api/v1/sessions:
+    post:
+      summary: Create a mock session
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "200":
+          description: Session created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /api/v1/sessions/{id}:
+    get:
+      summary: Get a mock session
+      operationId: getSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "404":
+          description: Not found.
+  /api/v1/messages:
+    post:
+      summary: Send a mock message
+      operationId: createMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageRequest"
+      responses:
+        "200":
+          description: Message accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /api/v1/sessions/{id}/messages:
+    get:
+      summary: List mock session messages
+      operationId: listSessionMessages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageListResponse"
+  /api/v1/sessions/{id}/stream:
+    get:
+      summary: Stream deterministic mock assistant output
+      operationId: streamSessionOutput
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: text
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Server-sent event stream with mock deltas.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /xiaozhi/ota/:
+    post:
+      summary: Fetch mock device bootstrap data
+      operationId: fetchDeviceBootstrap
+      parameters:
+        - name: Device-Id
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: Client-Id
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Mock bootstrap data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BootstrapResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+    Agent:
+      type: object
+      required: [id, name, description]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    AgentListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Agent"
+    CreateSessionRequest:
+      type: object
+      required: [device_id, agent_id]
+      properties:
+        device_id:
+          type: string
+        agent_id:
+          type: string
+    Session:
+      type: object
+      required: [id, device_id, agent_id]
+      properties:
+        id:
+          type: string
+        device_id:
+          type: string
+        agent_id:
+          type: string
+    SessionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/Session"
+    CreateMessageRequest:
+      type: object
+      required: [session_id, device_id, text]
+      properties:
+        session_id:
+          type: string
+        device_id:
+          type: string
+        text:
+          type: string
+    Message:
+      type: object
+      required: [id, session_id, role, text]
+      properties:
+        id:
+          type: string
+        session_id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        text:
+          type: string
+    MessageResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [user_message, assistant_message]
+          properties:
+            user_message:
+              $ref: "#/components/schemas/Message"
+            assistant_message:
+              $ref: "#/components/schemas/Message"
+    MessageListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+    BootstrapResponse:
+      type: object
+      required: [websocket, mode]
+      properties:
+        mode:
+          type: string
+          example: mock
+        websocket:
+          type: object
+          required: [url]
+          properties:
+            url:
+              type: string

@@ -1,0 +1,17 @@
+server:
+  host: 127.0.0.1
+  port: 8088
+
+demo:
+  mode: mock
+  provider: local-deterministic
+  persistence: memory
+
+features:
+  voiceprint: false
+  dual_device_coordination: false
+  echo_suppression: false
+
+notes:
+  - This file contains fake local values only.
+  - Production provider configuration and secrets are intentionally excluded.
