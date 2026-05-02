@@ -8,10 +8,14 @@ This repository is intentionally scoped as an evaluation build. It does not incl
 
 ## Submission Info
 
-- Event tag: `#Flux南客松S2`
+- Event tag: `flux-nankesong-s2`
 - Repository: `https://github.com/Renewdxin/kbao-flux`
 - Demo URL / package: `<OSS_DEMO_URL>`
 - Commercial disclosure: this is a partial source-available evaluation repository. Core commercial implementation remains private.
+
+## Project Poster
+
+![KBAO Flux project poster](./docs/assets/kbao-poster.png)
 
 ## Why it matters
 
